@@ -1,25 +1,29 @@
 from cassandra.cluster import Cluster
-from cassandra.auth import PlainTextAuthProvider
 from langchain.memory import CassandraChatMessageHistory, ConversationBufferMemory
 from langchain.llms import OpenAI
 from langchain import LLMChain, PromptTemplate
 import json
+import os
+from dotenv import load_dotenv
 
-cloud_config= {
-  'secure_connect_bundle': 'secure-connect-choose-your-own-adventure.zip'
-}
+# Load the environment variables from .env file
+load_dotenv()
 
-with open("choose_your_own_adventure-token.json") as f:
-    secrets = json.load(f)
+# Use environment variable for API key
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-CLIENT_ID = secrets["clientId"]
-CLIENT_SECRET = secrets["secret"]
-ASTRA_DB_KEYSPACE = ""
-OPENAI_API_KEY = ""
+# Cassandra connection settings for Docker container
+cassandra_host = 'cassandra-adventure'  # Name of your Cassandra container
+cassandra_port = 9042  # Default port for Cassandra
 
-auth_provider = PlainTextAuthProvider(CLIENT_ID, CLIENT_SECRET)
-cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+# Connect to the Cassandra cluster
+cluster = Cluster([cassandra_host], port=cassandra_port)
 session = cluster.connect()
+
+# Ensure you specify the correct keyspace
+ASTRA_DB_KEYSPACE = "adventure-game"  # Replace with your keyspace name
+
+###########
 
 message_history = CassandraChatMessageHistory(
     session_id="anything",
