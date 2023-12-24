@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  cassandra-adventure:
+    image: cassandra:latest
+    container_name: cassandra-adventure
+    environment:
+      - CASSANDRA_SEEDS=cassandra-adventure
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - adventure-game
+
+volumes:
+  cassandra_data:
+
+networks:
+  adventure-game:
+    driver: bridge
